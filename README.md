@@ -124,7 +124,6 @@ Users 1───N Bookings (as passenger)
 RideRequests 1───0..1 Bookings (accepted request → booking)
 ```
 
-Full diagram: [`docs/ER_DIAGRAM.md`](docs/ER_DIAGRAM.md).
 
 ---
 
@@ -192,22 +191,6 @@ Covers registration/login/validation, ride offering rules (capacity, same
 pickup/destination, future-time requirement), booking flows (seat deduction,
 overbooking prevention, self-booking prevention), and ownership permission
 checks.
-
----
-
-## 🖼️ Screenshots
-
-> Add screenshots of the running app here after your first local run, e.g.:
-> `docs/screenshots/landing.png`, `docs/screenshots/dashboard.png`,
-> `docs/screenshots/ride-details-map.png`
-
-| Page | Preview |
-|---|---|
-| Landing page | _add screenshot_ |
-| Offer a Ride | _add screenshot_ |
-| Ride Details (with map) | _add screenshot_ |
-| Driver Dashboard | _add screenshot_ |
-| Passenger Dashboard | _add screenshot_ |
 
 ---
 
