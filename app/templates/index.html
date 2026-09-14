@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}VPOOL - Share Your Ride{% endblock %}
+{% block content %}
+<section class="hero-section text-center">
+    <div class="container">
+        <h1 class="display-5 fw-bold"><i class="bi bi-car-front-fill"></i> VPOOL</h1>
+        <p class="lead">Vehicle Pooling System for students &amp; employees — share rides, save money, cut traffic.</p>
+        {% if user and user.is_authenticated %}
+            <a href="{{ url_for('ride.offer_ride') }}" class="btn btn-vp-accent btn-lg me-2">Offer a Ride</a>
+            <a href="{{ url_for('ride.search_ride') }}" class="btn btn-outline-light btn-lg">Find a Ride</a>
+        {% else %}
+            <a href="{{ url_for('auth.register') }}" class="btn btn-vp-accent btn-lg me-2">Get Started</a>
+            <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light btn-lg">Login</a>
+        {% endif %}
+    </div>
+</section>
+
+<div class="container my-5">
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card feature-card p-4 text-center">
+                <i class="bi bi-signpost-split display-6 text-success"></i>
+                <h5 class="mt-3">Smart Route Matching</h5>
+                <p class="text-muted">Our matching engine pairs pickup, destination, timing and available seats to surface the best ride for you.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card feature-card p-4 text-center">
+                <i class="bi bi-geo-alt-fill display-6 text-success"></i>
+                <h5 class="mt-3">Live Map &amp; Distance</h5>
+                <p class="text-muted">Every ride shows pickup &amp; destination on an OpenStreetMap view with estimated distance.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card feature-card p-4 text-center">
+                <i class="bi bi-shield-check display-6 text-success"></i>
+                <h5 class="mt-3">Secure Accounts</h5>
+                <p class="text-muted">Passwords are hashed, sessions managed with Flask-Login, and every booking is validated server-side.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="row align-items-center bg-white rounded-4 shadow-sm p-4">
+        <div class="col-md-8">
+            <h4>How it works</h4>
+            <ol class="text-muted">
+                <li>Register and complete your profile (vehicle details for drivers).</li>
+                <li>Drivers <strong>offer rides</strong> with pickup, destination, time &amp; seats.</li>
+                <li>Passengers <strong>search or get matched</strong> to rides on their route.</li>
+                <li>Join a ride instantly or send a request the driver can accept.</li>
+                <li>Track everything from your Driver / Passenger dashboard.</li>
+            </ol>
+        </div>
+        <div class="col-md-4 text-center">
+            <i class="bi bi-people-fill" style="font-size: 6rem; color: var(--vp-primary);"></i>
+        </div>
+    </div>
+</div>
+{% endblock %}

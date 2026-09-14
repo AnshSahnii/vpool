@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Sign Up - VPOOL{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="card auth-card p-4">
+        <h3 class="text-center mb-1">Create your account</h3>
+        <p class="text-center text-muted mb-4">Join VPOOL to start sharing rides</p>
+        <form method="POST" action="{{ url_for('auth.register') }}">
+            <div class="mb-3">
+                <label class="form-label">Full Name</label>
+                <input type="text" name="name" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" name="email" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Phone</label>
+                <input type="tel" name="phone" class="form-control" placeholder="10-15 digits" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">College / Organization</label>
+                <input type="text" name="organization" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Preferred Travel Timing</label>
+                <select name="preferred_time" class="form-select">
+                    <option value="">Select...</option>
+                    <option>Morning (8-10 AM)</option>
+                    <option>Afternoon (12-2 PM)</option>
+                    <option>Evening (5-7 PM)</option>
+                    <option>Night (8-10 PM)</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">I mostly want to</label>
+                <select name="role_preference" class="form-select">
+                    <option value="both">Drive &amp; ride as passenger</option>
+                    <option value="driver">Offer rides (Driver)</option>
+                    <option value="passenger">Find rides (Passenger)</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <input type="password" name="password" class="form-control" minlength="6" required>
+            </div>
+            <button type="submit" class="btn btn-vp-primary w-100">Create Account</button>
+        </form>
+        <p class="text-center mt-3 mb-0">Already have an account? <a href="{{ url_for('auth.login') }}">Login</a></p>
+    </div>
+</div>
+{% endblock %}

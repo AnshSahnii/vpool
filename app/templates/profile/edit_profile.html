@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Edit Profile - VPOOL{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            {% if not show_vehicle_form %}
+            <div class="card p-4 mb-4">
+                <h4 class="mb-3">Edit Profile</h4>
+                <form method="POST" action="{{ url_for('user.edit_profile') }}">
+                    <div class="mb-3">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" name="name" class="form-control" value="{{ user.name }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" name="email" class="form-control" value="{{ user.email }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Phone</label>
+                        <input type="tel" name="phone" class="form-control" value="{{ user.phone }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">College / Organization</label>
+                        <input type="text" name="organization" class="form-control" value="{{ user.organization or '' }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Preferred Travel Timing</label>
+                        <select name="preferred_time" class="form-select">
+                            <option value="">Select...</option>
+                            {% for opt in ["Morning (8-10 AM)", "Afternoon (12-2 PM)", "Evening (5-7 PM)", "Night (8-10 PM)"] %}
+                            <option {% if user.preferred_time == opt %}selected{% endif %}>{{ opt }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Role Preference</label>
+                        <select name="role_preference" class="form-select">
+                            <option value="both" {% if user.role_preference == 'both' %}selected{% endif %}>Drive &amp; ride as passenger</option>
+                            <option value="driver" {% if user.role_preference == 'driver' %}selected{% endif %}>Offer rides (Driver)</option>
+                            <option value="passenger" {% if user.role_preference == 'passenger' %}selected{% endif %}>Find rides (Passenger)</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-vp-primary">Save Changes</button>
+                    <a href="{{ url_for('user.profile') }}" class="btn btn-outline-secondary">Cancel</a>
+                </form>
+            </div>
+            {% endif %}
+
+            <div class="card p-4">
+                <h4 class="mb-3">Add a Vehicle</h4>
+                <form method="POST" action="{{ url_for('user.add_vehicle') }}">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Vehicle Type</label>
+                            <select name="vehicle_type" class="form-select" required>
+                                <option>Car</option><option>Bike</option><option>Auto</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Total Seats (for passengers)</label>
+                            <input type="number" name="total_seats" class="form-control" min="1" max="8" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Brand</label>
+                            <input type="text" name="brand" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Model</label>
+                            <input type="text" name="model" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Registration Number</label>
+                            <input type="text" name="registration_number" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Color</label>
+                            <input type="text" name="color" class="form-control">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Fuel Type</label>
+                            <select name="fuel_type" class="form-select">
+                                <option>Petrol</option>
+                                <option>Diesel</option>
+                                <option>CNG</option>
+                                <option>Electric</option>
+                                <option>Hybrid</option>
+                            </select>
+                            <div class="form-text">Eco-friendly rides (Electric/CNG/Hybrid) can be filtered by passengers when searching.</div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-vp-accent">Add Vehicle</button>
+                    <a href="{{ url_for('user.profile') }}" class="btn btn-outline-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

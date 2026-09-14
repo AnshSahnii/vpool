@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Passenger Dashboard - VPOOL{% endblock %}
+{% block content %}
+<div class="container">
+    <h4 class="mb-4"><i class="bi bi-speedometer2"></i> Passenger Dashboard</h4>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="stat-card bg-teal">
+                <div class="small">Upcoming Rides</div>
+                <div class="fs-3 fw-bold">{{ data.upcoming_rides|length }}</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card bg-orange">
+                <div class="small">Total Bookings</div>
+                <div class="fs-3 fw-bold">{{ data.total_bookings }}</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card bg-navy">
+                <div class="small">Money Saved (vs market)</div>
+                <div class="fs-3 fw-bold">₹{{ data.total_money_saved }}</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card" style="background: linear-gradient(135deg,#2e7d32,#66bb6a);">
+                <div class="small">CO₂ Saved</div>
+                <div class="fs-3 fw-bold">{{ data.total_co2_saved_kg }} kg</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-7">
+            <div class="card p-3 mb-4">
+                <h6>Upcoming Rides</h6>
+                <hr>
+                {% if data.upcoming_rides %}
+                    {% for b in data.upcoming_rides %}
+                    <div class="border rounded p-2 mb-2 d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ b.ride.pickup_location }} &rarr; {{ b.ride.destination }}</strong>
+                            <div class="small text-muted">{{ b.ride.departure_time[:16].replace('T',' ') }} | Seats: {{ b.seats_booked }} | ₹{{ b.fare }}</div>
+                            <div class="small text-muted">Driver: {{ b.ride.driver.name }} ({{ b.ride.driver.phone }})</div>
+                        </div>
+                        <form method="POST" action="/bookings/{{ b.id }}/cancel" onsubmit="return confirm('Cancel this booking?');">
+                            <button class="btn btn-sm btn-outline-danger">Cancel</button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <p class="text-muted">No upcoming rides. <a href="{{ url_for('ride.search_ride') }}">Find a ride</a>.</p>
+                {% endif %}
+            </div>
+
+            <div class="card p-3">
+                <h6>Booking History</h6>
+                <hr>
+                {% if data.booking_history %}
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle">
+                        <thead><tr><th>Route</th><th>Date</th><th>Status</th></tr></thead>
+                        <tbody>
+                        {% for b in data.booking_history %}
+                            <tr>
+                                <td>{{ b.ride.pickup_location }} &rarr; {{ b.ride.destination }}</td>
+                                <td class="small">{{ b.ride.departure_time[:16].replace('T',' ') }}</td>
+                                <td><span class="badge badge-status-{{ b.status if b.status == 'cancelled' else b.ride.status }}">{{ b.status }}</span></td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted small">No past bookings yet.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card p-3">
+                <h6>My Ride Requests</h6>
+                <hr>
+                {% if data.ride_requests %}
+                    {% for r in data.ride_requests %}
+                    <div class="border rounded p-2 mb-2 d-flex justify-content-between">
+                        <div class="small">
+                            Ride #{{ r.ride_id }} — {{ r.seats_requested }} seat(s)
+                        </div>
+                        <span class="badge bg-secondary">{{ r.status }}</span>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <p class="text-muted small">No ride requests sent.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

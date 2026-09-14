@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}Ride Details - VPOOL{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-lg-7">
+            <div class="card p-4 mb-4">
+                <div class="d-flex justify-content-between align-items-start">
+                    <h4>{{ ride.pickup_location }} <i class="bi bi-arrow-right"></i> {{ ride.destination }}</h4>
+                    <span class="badge badge-status-{{ ride.status }}">{{ ride.status|capitalize }}</span>
+                </div>
+                <p class="mb-2">
+                    <span class="badge bg-info text-dark">{{ 'Ride Now' if ride.ride_type == 'now' else 'Scheduled' }}</span>
+                    <span class="badge bg-secondary">{{ ride.vehicle.fuel_type }} vehicle</span>
+                </p>
+                <p class="text-muted mb-1"><i class="bi bi-calendar-event"></i> {{ ride.departure_time.strftime('%A, %d %b %Y — %I:%M %p') }}</p>
+                {% if ride.distance_km %}<p class="text-muted mb-1"><i class="bi bi-signpost-2"></i> Estimated distance: {{ ride.distance_km }} km</p>{% endif %}
+                <p class="text-muted mb-1"><i class="bi bi-people"></i> {{ ride.available_seats }} of {{ ride.total_seats }} seats available</p>
+
+                <div class="card bg-light p-3 my-2">
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="small text-muted">Market Fare</div>
+                            <div class="fw-bold text-decoration-line-through">₹{{ ride.market_fare or '-' }}</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="small text-muted">VPOOL Fare</div>
+                            <div class="fw-bold text-success">₹{{ ride.price_per_seat }}</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="small text-muted">You Save</div>
+                            {% if ride.market_fare %}
+                            <div class="fw-bold text-success">{{ ((1 - (ride.price_per_seat / ride.market_fare)) * 100) | round(0) }}%</div>
+                            {% else %}
+                            <div class="fw-bold">-</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                {% if ride.min_passengers and ride.min_passengers > 1 %}
+                <div class="alert {{ 'alert-success' if ride.current_passengers >= ride.min_passengers else 'alert-warning' }} py-2">
+                    {% if ride.current_passengers >= ride.min_passengers %}
+                        <i class="bi bi-check-circle"></i> Pool ready — {{ ride.current_passengers }}/{{ ride.min_passengers }} minimum passengers reached.
+                    {% else %}
+                        <i class="bi bi-hourglass-split"></i> Waiting for pool — {{ ride.current_passengers }}/{{ ride.min_passengers }} passengers needed before the driver plans to start.
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                {% if ride.co2_saved_kg %}
+                <p class="text-success small mb-1"><i class="bi bi-tree"></i> Estimated {{ ride.co2_saved_kg }} kg CO₂ saved by pooling this ride so far.</p>
+                {% endif %}
+
+                {% if ride.notes %}<p class="text-muted"><i class="bi bi-chat-left-text"></i> {{ ride.notes }}</p>{% endif %}
+
+                <hr>
+                <h6>Driver</h6>
+                <p class="mb-0">{{ ride.driver.name }} &middot; {{ ride.driver.organization or '' }}</p>
+                <p class="text-muted small">Phone: {{ ride.driver.phone }}</p>
+
+                <h6 class="mt-3">Vehicle</h6>
+                <p class="mb-0">{{ ride.vehicle.brand }} {{ ride.vehicle.model }} ({{ ride.vehicle.registration_number }}) — {{ ride.vehicle.color or '' }}</p>
+            </div>
+
+            {% if ride.status == 'scheduled' %}
+                {% if user.is_authenticated and user.id != ride.driver_id %}
+                <div class="card p-4 mb-4">
+                    <h6>Join this ride</h6>
+                    <form method="POST" action="{{ url_for('booking.join_ride_view', ride_id=ride.id) }}" class="row g-2">
+                        <div class="col-6">
+                            <input type="number" name="seats_booked" class="form-control" min="1" max="{{ ride.available_seats }}" value="1">
+                        </div>
+                        <div class="col-6">
+                            <button type="submit" class="btn btn-vp-primary w-100">Join Instantly</button>
+                        </div>
+                    </form>
+                </div>
+                {% elif user.is_authenticated and user.id == ride.driver_id %}
+                <form method="POST" action="{{ url_for('ride.cancel_ride_view', ride_id=ride.id) }}"
+                      onsubmit="return confirm('Cancel this ride?');">
+                    <button type="submit" class="btn btn-outline-danger w-100 mb-4">Cancel Ride</button>
+                </form>
+                {% endif %}
+            {% endif %}
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card p-3">
+                <h6><i class="bi bi-map"></i> Route Preview</h6>
+                <div id="ride-map" style="height:320px;border-radius:.6rem;"></div>
+                <div id="ride-map-distance" class="small text-muted mt-2"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_scripts %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="{{ url_for('static', filename='js/map.js') }}"></script>
+<script>
+    renderRideMap('ride-map', {{ ride.pickup_lat or 'null' }}, {{ ride.pickup_lng or 'null' }},
+                  {{ ride.destination_lat or 'null' }}, {{ ride.destination_lng or 'null' }},
+                  {{ ride.distance_km or 'null' }});
+</script>
+{% endblock %}

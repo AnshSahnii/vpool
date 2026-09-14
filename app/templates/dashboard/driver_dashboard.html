@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Driver Dashboard - VPOOL{% endblock %}
+{% block content %}
+<div class="container">
+    <h4 class="mb-4"><i class="bi bi-speedometer2"></i> Driver Dashboard</h4>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="stat-card bg-teal">
+                <div class="small">Active Rides</div>
+                <div class="fs-3 fw-bold">{{ data.active_rides_count }}</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card bg-orange">
+                <div class="small">Active Bookings</div>
+                <div class="fs-3 fw-bold">{{ data.active_bookings_count }}</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card bg-navy">
+                <div class="small">Total Earnings (est.)</div>
+                <div class="fs-3 fw-bold">₹{{ data.total_earnings }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-7">
+            <div class="card p-3 mb-4">
+                <h6>Offered Rides</h6>
+                <hr>
+                {% if data.offered_rides %}
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle">
+                        <thead><tr><th>Route</th><th>Departure</th><th>Seats</th><th>Pool</th><th>Status</th><th></th></tr></thead>
+                        <tbody>
+                        {% for r in data.offered_rides %}
+                            <tr>
+                                <td>{{ r.pickup_location }} &rarr; {{ r.destination }}</td>
+                                <td class="small">{{ r.departure_time[:16].replace('T',' ') }}</td>
+                                <td>{{ r.available_seats }}/{{ r.total_seats }}</td>
+                                <td>
+                                    {% if r.min_passengers and r.min_passengers > 1 %}
+                                        {% if r.pool_ready %}
+                                            <span class="badge bg-success">Ready ({{ r.current_passengers }}/{{ r.min_passengers }})</span>
+                                        {% else %}
+                                            <span class="badge bg-warning text-dark">Waiting ({{ r.current_passengers }}/{{ r.min_passengers }})</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="text-muted small">N/A</span>
+                                    {% endif %}
+                                </td>
+                                <td><span class="badge badge-status-{{ r.status }}">{{ r.status }}</span></td>
+                                <td><a href="/rides/{{ r.id }}" class="btn btn-sm btn-outline-secondary">View</a></td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">You haven't offered any rides yet. <a href="{{ url_for('ride.offer_ride') }}">Offer one now</a>.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card p-3">
+                <h6>Pending Join Requests</h6>
+                <hr>
+                {% if data.pending_requests %}
+                    {% for req in data.pending_requests %}
+                    <div class="border rounded p-2 mb-2">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <strong>{{ req.passenger_name }}</strong>
+                                <div class="small text-muted">Seats requested: {{ req.seats_requested }}</div>
+                            </div>
+                            <div>
+                                <form method="POST" action="/requests/{{ req.id }}/respond" class="d-inline">
+                                    <input type="hidden" name="decision" value="accept">
+                                    <button class="btn btn-sm btn-success">Accept</button>
+                                </form>
+                                <form method="POST" action="/requests/{{ req.id }}/respond" class="d-inline">
+                                    <input type="hidden" name="decision" value="reject">
+                                    <button class="btn btn-sm btn-outline-danger">Reject</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <p class="text-muted small">No pending requests.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
